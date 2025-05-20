@@ -1,10 +1,9 @@
 <script lang="ts">
-	let { children } = $props();
+    let { children } = $props();
 </script>
 
 <nav>
-	<a href="/">Home</a>
-	<a href="/melanie">Melanie</a>
+    <a href="/">Home</a>
 </nav>
 
 {@render children()}
