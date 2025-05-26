@@ -16,6 +16,10 @@
         console.log(filecsv.name);
     }
 
+    $: if (countrieSelect && L && map) {
+        loadCountryGeojson(countrieSelect);
+    }
+
     function updateMapWithGeoJSON(data: any) {
         if (!map || !L || !data) return;
 
@@ -66,7 +70,7 @@
             });
 
             // Inicializar el mapa
-            map = L.map('map').setView([400, -400], 10); // Vista mundial inicial
+            map = L.map('map').setView([0, 0], 10); // Vista mundial inicial
 
             // Agregar capa base de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
