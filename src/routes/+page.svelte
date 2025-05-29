@@ -1,13 +1,14 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { browser } from "$app/environment"; // Solo si usas SvelteKit
+    import { browser } from "$app/environment";
+    import * as topojson from "topojson-client";
 
     let countries: Array<string> = ["Ecuador", "Italia"];
     let countrieSelect = countries[0];
     let fileInput: HTMLInputElement;
     let filecsv: File | null;
     let geoJsonData: any = null;
-    let L: any = null; // Variable para Leaflet
+    let L: any = null;
     let map: any = null;
     let geoJsonLayer: any = null;
 
@@ -18,7 +19,7 @@
     }
 
     $: if (countrieSelect && L && map) {
-        loadCountryGeojson(countrieSelect);
+        loadCountryData(countrieSelect);
     }
 
     function updateMapWithGeoJSON(data: any) {
@@ -44,37 +45,41 @@
         map.fitBounds(geoJsonLayer.getBounds());
     }
 
-    function onMapClick(e: any) {
-        console.log(e);
-        popup
-            .setLatLng(e.latlng)
-            .setContent("You clicked the map at " + e.latlng.toString())
-            .openOn(map);
+    // Función para convertir TopoJSON a GeoJSON
+    function convertTopoJSONToGeoJSON(topoData: any): any {
+        // Obtener la primera clave del objeto objects (normalmente será el nombre del layer)
+        const objectKeys = Object.keys(topoData.objects);
+        if (objectKeys.length === 0) {
+            throw new Error("No objects found in TopoJSON");
+        }
+
+        // Usar la primera clave disponible
+        const objectKey = objectKeys[0];
+        return topojson.feature(topoData, topoData.objects[objectKey]);
     }
 
-    async function loadCountryGeojson(country: string) {
+    async function loadCountryData(country: string) {
         try {
-            const response = await fetch(
-                `/geojson/${country.toLowerCase()}.geojson`,
+            let response = await fetch(
+                `/topojson/${country.toLowerCase()}.topojson`,
             );
-            if (!response.ok)
-                throw new Error("Tenemos problemas para cargar el mapa");
-            geoJsonData = await response.json();
+
+            const data = await response.json();
+
+            geoJsonData = convertTopoJSONToGeoJSON(data);
 
             if (map && L) {
                 updateMapWithGeoJSON(geoJsonData);
             }
-            console.log(geoJsonData);
-        } catch (error) {}
+        } catch (error) {
+            console.error("Error loading map data:", error);
+        }
     }
 
     onMount(async () => {
-        // Solo ejecutar en el browser (importante para SvelteKit)
         if (browser) {
-            // Importar Leaflet dinámicamente
             L = await import("leaflet");
 
-            // Configurar iconos por defecto de Leaflet
             delete L.Icon.Default.prototype._getIconUrl;
             L.Icon.Default.mergeOptions({
                 iconRetinaUrl:
@@ -85,18 +90,14 @@
                     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
             });
 
-            // Inicializar el mapa
-            map = L.map("map").setView([0, 0], 10); // Vista mundial inicial
-
+            map = L.map("map").setView([0, 0], 10);
             popup = L.popup();
 
-            // Agregar capa base de OpenStreetMap
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "© OpenStreetMap contributors",
             }).addTo(map);
 
-            // Cargar GeoJSON inicial de Ecuador
-            await loadCountryGeojson("ecuador");
+            await loadCountryData("ecuador");
         }
     });
 
@@ -108,8 +109,8 @@
 
 <main class="m-3">
     <h2>
-        Bienvenido , aquí podras realizar tus reportes usando mapas de distintos
-        paises
+        Bienvenido, aquí podrás realizar tus reportes usando mapas de distintos
+        países
     </h2>
     <select class="form-select" bind:value={countrieSelect}>
         {#each countries as value}
@@ -127,7 +128,7 @@
                 class="form-control"
                 type="file"
                 id="formFile"
-                accept=".geojson"
+                accept=".topojson,.topojson"
                 bind:this={fileInput}
                 on:input={updateFile}
             />
