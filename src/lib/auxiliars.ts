@@ -1,4 +1,5 @@
 import * as topojson from "topojson-client";
+import Papa from "papaparse";
 
 function convertTopoJSONToGeoJSON(topoData: any): any {
   // Obtener la primera clave del objeto objects (normalmente será el nombre del layer)
@@ -7,13 +8,16 @@ function convertTopoJSONToGeoJSON(topoData: any): any {
     throw new Error("No objects found in TopoJSON");
   }
 
-  // Usar la primera clave disponible
   const objectKey = objectKeys[0];
   return topojson.feature(topoData, topoData.objects[objectKey]);
 }
 
 function processCSVFile(fileCSV: File) {
-  console.log(fileCSV.name);
+  Papa.parse(fileCSV, {
+    complete: function (results) {
+      console.log(results);
+    }
+  });
 }
 
 export { convertTopoJSONToGeoJSON, processCSVFile };
