@@ -113,7 +113,6 @@
         <MutiRange
           min={0}
           max={100}
-          delimiterCount={3}
           on:change={(e) => console.log(e.detail.delimiters)}
         />
       </div>
