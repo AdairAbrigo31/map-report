@@ -1,7 +1,7 @@
 <main>
     <p class="phrase">
-        En fin, aquí me tienes siempre. No pienses, aunque haya silencio, que
-        también hay olvido. Tú sabes que no es así. Nunca podrá ser.
+        Debo seguir este viaje y aunque no me acompañes te llevo conmigo. Ya no
+        como lo bonito que pudo haber sido, sino como lo bonito que fue.
     </p>
     <img src="/melanie_adair.jpeg" alt="Melanie" class="melanie-adair-photo" />
 </main>
