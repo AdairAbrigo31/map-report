@@ -79,6 +79,10 @@
     }
   }
 
+  function applyFilters() {
+    console.log("APlicando filtros");
+  }
+
   onMount(async () => {
     if (browser) {
       L = await initializeLeaflet();
@@ -184,6 +188,12 @@
         bind:this={fileInput}
         on:input={updateFile}
       />
+
+      <button
+        type="button"
+        class="btn btn-primary btn-lg"
+        on:click={applyFilters}>Aplicar filtros</button
+      >
     </div>
   </div>
 </main>

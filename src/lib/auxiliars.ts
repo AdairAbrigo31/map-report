@@ -14,6 +14,8 @@ function convertTopoJSONToGeoJSON(topoData: any): any {
 
 function processCSVFile(fileCSV: File) {
   Papa.parse(fileCSV, {
+    header: true,
+    dynamicTyping: true,
     complete: function (results) {
       console.log(results);
     }
