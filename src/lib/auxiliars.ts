@@ -17,7 +17,12 @@ function processCSVFile(fileCSV: File) {
     header: true,
     dynamicTyping: true,
     complete: function (results) {
-      console.log(results);
+      let firstElement: any = results.data[0];
+      if (firstElement['Total'] === undefined || firstElement['Total'] === null) {
+        throw new Error("CSV file does not contain 'total' column");
+      } else {
+        console.log(results);
+      }
     }
   });
 }

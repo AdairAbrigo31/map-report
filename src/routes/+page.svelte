@@ -99,9 +99,68 @@
       map.remove();
     }
   });
+
+  function showErrorModal(title: string, message: string) {
+    const modalTitle = document.getElementById("modalErrorLabel");
+    const modalBody = document.querySelector("#modalError .modal-body");
+
+    if (modalTitle) modalTitle.textContent = title;
+    if (modalBody) modalBody.textContent = message;
+
+    if (typeof (window as any).bootstrap !== "undefined") {
+      const modal = new (window as any).bootstrap.Modal(
+        document.getElementById("modalError"),
+      );
+      modal.show();
+    } else {
+      console.error("Bootstrap no está disponible");
+    }
+  }
 </script>
 
 <main class="m-3">
+  <button
+    type="button"
+    class="btn btn-primary"
+    on:click={() => showErrorModal("Error", "Este es un mensaje de error")}
+  >
+    Launch static backdrop modal
+  </button>
+
+  <!-- Modal -->
+  <div
+    class="modal fade"
+    id="modalError"
+    data-bs-backdrop="static"
+    data-bs-keyboard="false"
+    tabindex="-1"
+    aria-labelledby="modalErrorLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger">
+          <h1 class="modal-title fs-5" id="modalErrorLabel">Modal title</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">...</div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal">Close</button
+          >
+          <button type="button" class="btn btn-primary">Understood</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h2>
     Bienvenido, aquí podrás realizar tus reportes usando mapas de distintos
     países
