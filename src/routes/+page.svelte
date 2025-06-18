@@ -8,7 +8,7 @@
   } from "$lib/services/mapService";
   import { processCSVFile } from "$lib/auxiliars";
   import loadCountryData from "$lib/services/dataService";
-  import MutiRange from "../lib/components/MultiRange.svelte";
+  import MutiRange from "../lib/components/multi_range.svelte";
 
   // Estado del componente
   let countries: Array<string> = ["Ecuador", "Italia"];
@@ -48,7 +48,7 @@
         map,
         geoJsonData,
         geoJsonLayer,
-        popup,
+        popup
       );
     } catch (err) {
       error = err instanceof Error ? err.message : "Error desconocido";
@@ -65,18 +65,6 @@
     }
     filecsv = file || null;
     error = null;
-  }
-
-  function addDelimiter() {
-    delimiters += 1;
-  }
-
-  function removeDelimiter() {
-    if (delimiters > 1) {
-      delimiters -= 1;
-    } else {
-      error = "No se puede eliminar más delimitadores";
-    }
   }
 
   onMount(async () => {
@@ -108,20 +96,8 @@
   {/if}
 
   {#if true}
-    <div class="container-filters row">
-      <div class="col-10">
-        <MutiRange
-          min={0}
-          max={100}
-          on:change={(e) => console.log(e.detail.delimiters)}
-        />
-      </div>
-      <div class="col-2">
-        <button on:click={addDelimiter}> Agregar </button>
-        {#if delimiters > 1}<button on:click={removeDelimiter}>
-            Quitar
-          </button>{/if}
-      </div>
+    <div class="container-filters">
+      <MutiRange min={0} max={100} onchange={(e) => console.log(e)} />
     </div>
   {/if}
 
