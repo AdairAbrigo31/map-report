@@ -1,7 +1,7 @@
 <main>
     <p class="phrase">
-        Debo seguir este viaje y aunque no me acompañes te llevo conmigo. Ya no
-        como lo bonito que pudo haber sido, sino como lo bonito que fue.
+        Me gustaste por quien eres; y quien eres es alguien que se va. Pero para
+        él, eres alguien que se queda.
     </p>
     <img src="/melanie_adair.jpeg" alt="Melanie" class="melanie-adair-photo" />
 </main>
