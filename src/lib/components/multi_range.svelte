@@ -98,7 +98,7 @@
     const newRanges: RangeData[] = [];
 
     for (let i = 0; i <= values.length; i++) {
-      const rangeMin = i === 0 ? min : values[i - 1];
+      const rangeMin = i === 0 ? min : values[i - 1] + 1;
       const rangeMax = i === values.length ? max : values[i];
 
       newRanges.push({
@@ -122,7 +122,7 @@
       ? values
           .slice(0, -1)
           .map((startValue, i) =>
-            calculateSegmentPosition(startValue, values[i + 1])
+            calculateSegmentPosition(startValue, values[i + 1]),
           )
       : [];
 
@@ -146,7 +146,7 @@
 
   function notifyParent(
     type: "thumbMoved" | "thumbsReset" | "colorChanged",
-    movedIndex?: number
+    movedIndex?: number,
   ): void {
     onchange?.({
       type,
@@ -161,7 +161,7 @@
   function getValidValue(thumbIndex: number, newValue: number): number {
     const leftBound = thumbIndex === 0 ? min : values[thumbIndex - 1] + 1;
     const rightBound =
-      thumbIndex === values.length - 1 ? max : values[thumbIndex + 1] - 1;
+      thumbIndex === values.length - 1 ? max - 1 : values[thumbIndex + 1] - 1; // ← CAMBIAR max por max - 1
     return Math.max(leftBound, Math.min(rightBound, newValue));
   }
 
@@ -169,7 +169,8 @@
     const validValue = getValidValue(thumbIndex, val);
     if (values[thumbIndex] !== validValue) {
       values[thumbIndex] = validValue;
-      values = [...values]; // Trigger reactivity
+      values = [...values];
+      calculateRanges();
       notifyParent("thumbMoved", thumbIndex);
     }
   }
@@ -203,7 +204,7 @@
     const delta = clientX - (elementX + 10);
     const percent = Math.max(
       0,
-      Math.min(100, (delta * 100) / (container.clientWidth - 10))
+      Math.min(100, (delta * 100) / (container.clientWidth - 10)),
     );
     const newValue = Math.round((percent * (max - min)) / 100) + min;
 
@@ -353,7 +354,7 @@
       −
     </button>
     <span class="range__count" aria-live="polite">
-      Delimiters: {thumbCount}
+      Delimitadores: {thumbCount}
     </span>
   </div>
 
@@ -370,10 +371,12 @@
   >
     <div class="range__track" bind:this={container}>
       <!-- Progress segments between thumbs -->
-      {#each progressSegmentStyles as segment, index (index)}
+      {#each ranges as range, index (index)}
         <div
           class="range__track--segment"
-          style="left: {segment.left}; width: {segment.width};"
+          style="left: {((range.min - min) * 100) / (max - min)}%; 
+           width: {((range.max - range.min) * 100) / (max - min)}%; 
+           background-color: {range.color};"
         ></div>
       {/each}
 
@@ -534,10 +537,12 @@
   }
 
   .range__track--segment {
+    /*
     background: var(
       --track-highlight-bg,
       linear-gradient(90deg, #6185ff, #9c65ff)
     );
+    */
     height: 6px;
     position: absolute;
     border-radius: 999px;
