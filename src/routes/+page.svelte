@@ -6,9 +6,10 @@
     createMap,
     updateMapWithGeoJSON,
   } from "$lib/services/mapService";
-  import { processCSVFile } from "$lib/auxiliars";
+  //import { processCSVFile } from "$lib/auxiliars";
   import loadCountryData from "$lib/services/dataService";
-  import MutiRange from "../lib/components/MultiRange.svelte";
+  import MutiRange from "../lib/components/multi_range.svelte";
+  import Papa from "papaparse";
 
   // Estado del componente
   let countries: Array<string> = ["Ecuador", "Italia"];
@@ -35,6 +36,35 @@
 
   $: if (countrieSelect && L && map) {
     handleCountryChange(countrieSelect);
+  }
+
+  function processCSVFile(file: File) {
+    Papa.parse(file, {
+      header: true,
+      dynamicTyping: true,
+      complete: function (results) {
+        console.log(results);
+        if (results.errors.length > 0 || results.data.length === 0) {
+          filecsv = null;
+          showErrorModal(
+            "Error",
+            "Hubo un error al procesar el archivo CSV. Por favor, verifica el formato, recuerda que debe tener un encabezado con minimo dos campos, ademas claro de tener data.",
+          );
+          return;
+        }
+        let firstElement: any = results.data[0];
+        if (
+          firstElement["Total"] === undefined ||
+          firstElement["Total"] === null
+        ) {
+          filecsv = null;
+          showErrorModal(
+            "Error",
+            "La columna 'Total' es obligatoria en su csv y debe ser un valor numérico",
+          );
+        }
+      },
+    });
   }
 
   async function handleCountryChange(country: string) {
@@ -65,18 +95,6 @@
     }
     filecsv = file || null;
     error = null;
-  }
-
-  function addDelimiter() {
-    delimiters += 1;
-  }
-
-  function removeDelimiter() {
-    if (delimiters > 1) {
-      delimiters -= 1;
-    } else {
-      error = "No se puede eliminar más delimitadores";
-    }
   }
 
   function applyFilters() {
@@ -119,14 +137,6 @@
 </script>
 
 <main class="m-3">
-  <button
-    type="button"
-    class="btn btn-primary"
-    on:click={() => showErrorModal("Error", "Este es un mensaje de error")}
-  >
-    Launch static backdrop modal
-  </button>
-
   <!-- Modal -->
   <div
     class="modal fade"
@@ -165,28 +175,6 @@
     Bienvenido, aquí podrás realizar tus reportes usando mapas de distintos
     países
   </h2>
-
-  {#if error}
-    <div class="alert alert-danger">{error}</div>
-  {/if}
-
-  {#if true}
-    <div class="container-filters row">
-      <div class="col-10">
-        <MutiRange
-          min={0}
-          max={100}
-          on:change={(e) => console.log(e.detail.delimiters)}
-        />
-      </div>
-      <div class="col-2">
-        <button on:click={addDelimiter}> Agregar </button>
-        {#if delimiters > 1}<button on:click={removeDelimiter}>
-            Quitar
-          </button>{/if}
-      </div>
-    </div>
-  {/if}
 
   <div class="row">
     <select
@@ -248,11 +236,19 @@
         on:input={updateFile}
       />
 
-      <button
-        type="button"
-        class="btn btn-primary btn-lg"
-        on:click={applyFilters}>Aplicar filtros</button
-      >
+      {#if filecsv}
+        <div class="container-filters">
+          <MutiRange min={0} max={100} onchange={(e) => console.log(e)} />
+        </div>
+      {/if}
+
+      {#if filecsv}
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          on:click={applyFilters}>Aplicar filtros</button
+        >
+      {/if}
     </div>
   </div>
 </main>
