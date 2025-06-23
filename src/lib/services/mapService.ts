@@ -1,4 +1,5 @@
 import { browser } from "$app/environment";
+import type { ChangeEvent } from "$lib/interfaces/IChangeEvent";
 
 async function initializeLeaflet() {
   if (browser) {
@@ -30,19 +31,59 @@ function createMap(leaflet: any, containerID: string) {
   return { map, popup };
 }
 
+
+function paintMapWithGeoJSON(
+  leaflet: any,
+  map: any,
+  geoJsonLayer: any,
+  popup: any,
+  datCSV: any,
+  filters: ChangeEvent) {
+
+  if (geoJsonLayer) {
+    geoJsonLayer.eachLayer((layer: any) => {
+      const feature = layer.feature;
+      const total = datCSV.find(
+        (item: any) => item.Canton === feature.properties.name
+      )?.Total;
+
+      const color = getColorsByFilters(filters, total);
+
+      // Aplicar nuevo estilo
+      layer.setStyle({
+        fillColor: color,
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        fillOpacity: 0.7
+      });
+
+      layer.on("click", (e: any) => {
+        popup
+          .setLatLng(e.latlng)
+          .setContent(feature.properties.name + ' - ' + total)
+          .openOn(map);
+      });
+    });
+  }
+
+  return geoJsonLayer;
+
+}
+
 function updateMapWithGeoJSON(
   leaflet: any,
   map: any,
   data: any,
   geoJsonLayer: any,
-  popup: any
+  popup: any,
 ) {
   // Remover capa anterior
   if (geoJsonLayer) {
     map.removeLayer(geoJsonLayer);
   }
 
-  // Agregar nueva capa
+  // Agregar nueva capa - Mapeo cuando cambia de mapa (Sin filtros)
   const newLayer = leaflet
     .geoJSON(data, {
       onEachFeature: (feature: any, layer: any) => {
@@ -58,6 +99,24 @@ function updateMapWithGeoJSON(
 
   map.fitBounds(newLayer.getBounds());
   return newLayer;
+
+
+
+
 }
 
-export { initializeLeaflet, createMap, updateMapWithGeoJSON };
+
+function getColorsByFilters(filters: ChangeEvent, total: number) {
+  if (!total || !filters?.ranges) return '#cccccc'; // ← Valor por defecto
+
+  let ranges = filters.ranges;
+  for (let i = 0; i < ranges.length; i++) {
+    const range = ranges[i];
+    if (total >= range.min && total <= range.max) {
+      return range.color;
+    }
+  }
+  return '#cccccc'; // ← Valor por defecto si no está en ningún rango
+}
+
+export { initializeLeaflet, createMap, updateMapWithGeoJSON, paintMapWithGeoJSON };

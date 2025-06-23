@@ -93,13 +93,27 @@
     return Array.from({ length: rangeCount }, () => getRandomColor());
   }
 
-  // Calculate ranges from values and colors
+  // ✅ LÓGICA DE RANGOS: Mantiene gaps correctos para la lógica de valores
   function calculateRanges(): void {
     const newRanges: RangeData[] = [];
 
     for (let i = 0; i <= values.length; i++) {
-      const rangeMin = i === 0 ? min : values[i - 1] + 1;
-      const rangeMax = i === values.length ? max : values[i];
+      let rangeMin: number;
+      let rangeMax: number;
+
+      if (i === 0) {
+        // Primer rango: desde min hasta el primer valor
+        rangeMin = min;
+        rangeMax = values.length > 0 ? values[0] : max;
+      } else if (i === values.length) {
+        // Último rango: desde el último valor + 1 hasta max
+        rangeMin = values[i - 1] + 1; // ✅ MANTENER +1 para lógica correcta
+        rangeMax = max;
+      } else {
+        // Rangos intermedios: desde valor anterior + 1 hasta valor actual
+        rangeMin = values[i - 1] + 1; // ✅ MANTENER +1 para lógica correcta
+        rangeMax = values[i];
+      }
 
       newRanges.push({
         min: rangeMin,
@@ -128,10 +142,12 @@
 
   // Initialize values based on thumb count
   function calculateDefaultValues(count: number): number[] {
-    if (count === 1) return [(min + max) / 2];
+    if (count === 1) return [Math.round((min + max) / 2)];
 
     const step = (max - min) / (count + 1);
-    return Array.from({ length: count }, (_, i) => min + step * (i + 1));
+    return Array.from({ length: count }, (_, i) =>
+      Math.round(min + step * (i + 1)),
+    );
   }
 
   async function resetComponentState(): Promise<void> {
@@ -158,10 +174,11 @@
     });
   }
 
+  // ✅ LÓGICA DE LÍMITES: Validación correcta para evitar overlaps
   function getValidValue(thumbIndex: number, newValue: number): number {
     const leftBound = thumbIndex === 0 ? min : values[thumbIndex - 1] + 1;
     const rightBound =
-      thumbIndex === values.length - 1 ? max - 1 : values[thumbIndex + 1] - 1; // ← CAMBIAR max por max - 1
+      thumbIndex === values.length - 1 ? max - 1 : values[thumbIndex + 1] - 1;
     return Math.max(leftBound, Math.min(rightBound, newValue));
   }
 
@@ -179,7 +196,7 @@
     colors[rangeIndex] = color;
     colors = [...colors];
     showColorPicker = null;
-    calculateRanges(); // ← ¡ESTA LÍNEA FALTA!
+    calculateRanges();
     notifyParent("colorChanged");
   }
 
@@ -198,6 +215,7 @@
     };
   }
 
+  // ✅ MODIFICACIÓN: Asegurar valores enteros en el cálculo
   function calculateNewValue(clientX: number, thumbIndex: number): void {
     if (!container) return;
 
@@ -370,12 +388,20 @@
     {id}
   >
     <div class="range__track" bind:this={container}>
-      <!-- Progress segments between thumbs -->
+      <!-- ✅ PINTADO VISUAL: Segmentos continuos sin gaps para cubrir 100% de la barra -->
       {#each ranges as range, index (index)}
         <div
           class="range__track--segment"
-          style="left: {((range.min - min) * 100) / (max - min)}%; 
-           width: {((range.max - range.min) * 100) / (max - min)}%; 
+          style="left: {index === 0
+            ? 0
+            : ((values[index - 1] - min) * 100) / (max - min)}%; 
+           width: {index === 0
+            ? values.length > 0
+              ? ((values[0] - min) * 100) / (max - min)
+              : 100
+            : index === ranges.length - 1
+              ? 100 - ((values[index - 1] - min) * 100) / (max - min)
+              : ((values[index] - values[index - 1]) * 100) / (max - min)}%; 
            background-color: {range.color};"
         ></div>
       {/each}
@@ -537,12 +563,6 @@
   }
 
   .range__track--segment {
-    /*
-    background: var(
-      --track-highlight-bg,
-      linear-gradient(90deg, #6185ff, #9c65ff)
-    );
-    */
     height: 6px;
     position: absolute;
     border-radius: 999px;
@@ -608,7 +628,6 @@
     border-radius: 0 0 0 3px;
   }
 
-  /* New styles for color functionality */
   .range__summary {
     margin-top: 1.5rem;
     padding: 1rem;

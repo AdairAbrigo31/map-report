@@ -18,7 +18,7 @@ function processCSVFile(fileCSV: File) {
     dynamicTyping: true,
     complete: function (results) {
       let firstElement: any = results.data[0];
-      if (firstElement['Total'] === undefined || firstElement['Total'] === null) {
+      if (firstElement['Total'] === undefined || firstElement['Total'] === null || firstElement['Canton'] == undefined || firstElement['Canton'] == null) {
         throw new Error("CSV file does not contain 'total' column");
       } else {
         console.log(results);
@@ -27,4 +27,26 @@ function processCSVFile(fileCSV: File) {
   });
 }
 
-export { convertTopoJSONToGeoJSON, processCSVFile };
+function calculateMinAndMax(dataCSV: []) {
+  if (!dataCSV || dataCSV.length === 0) {
+    throw new Error("No data provided for min/max calculation");
+  }
+
+  let min = Infinity;
+  let max = -Infinity;
+
+  dataCSV.forEach((item: any) => {
+    if (item.Total !== undefined && item.Total !== null) {
+      if (item.Total < min) {
+        min = item.Total;
+      }
+      if (item.Total > max) {
+        max = item.Total;
+      }
+    }
+  });
+
+  return { min, max };
+}
+
+export { convertTopoJSONToGeoJSON, processCSVFile, calculateMinAndMax };

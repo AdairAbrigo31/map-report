@@ -5,11 +5,13 @@
     initializeLeaflet,
     createMap,
     updateMapWithGeoJSON,
+    paintMapWithGeoJSON,
   } from "$lib/services/mapService";
   //import { processCSVFile } from "$lib/auxiliars";
   import loadCountryData from "$lib/services/dataService";
   import MutiRange from "../lib/components/multi_range.svelte";
   import Papa from "papaparse";
+  import type { ChangeEvent } from "$lib/interfaces/IChangeEvent";
 
   // Estado del componente
   let countries: Array<string> = ["Ecuador", "Italia"];
@@ -17,6 +19,7 @@
   let mapLevel: "provincias" | "cantones" = "cantones";
   let fileInput: HTMLInputElement;
   let filecsv: File | null;
+  let dataCSV: any = null;
   let isLoading = false;
   let error: string | null = null;
 
@@ -25,9 +28,11 @@
   let map: any = null;
   let popup: any = null;
   let geoJsonLayer: any = null;
+  let minValueCSV: number;
+  let maxValueCSV: number;
 
-  // Variables del filtro
-  let delimiters = 1;
+  // Capturar los cambios del multi-range
+  let filters: ChangeEvent;
 
   // Reactive statements
   $: if (filecsv) {
@@ -43,7 +48,6 @@
       header: true,
       dynamicTyping: true,
       complete: function (results) {
-        console.log(results);
         if (results.errors.length > 0 || results.data.length === 0) {
           filecsv = null;
           showErrorModal(
@@ -62,7 +66,16 @@
             "Error",
             "La columna 'Total' es obligatoria en su csv y debe ser un valor numérico",
           );
+          return;
         }
+        dataCSV = results.data;
+        minValueCSV = Math.min(
+          ...dataCSV.map((item: any) => item["Total"] || 0),
+        );
+        maxValueCSV = Math.max(
+          ...dataCSV.map((item: any) => item["Total"] || 0),
+        );
+        console.log(dataCSV);
       },
     });
   }
@@ -98,7 +111,24 @@
   }
 
   function applyFilters() {
-    console.log("APlicando filtros");
+    console.log("Aplicando filtros", filters);
+    isLoading = true;
+    error = null;
+
+    try {
+      geoJsonLayer = paintMapWithGeoJSON(
+        L,
+        map,
+        geoJsonLayer,
+        popup,
+        dataCSV,
+        filters,
+      );
+    } catch (err) {
+      error = err instanceof Error ? err.message : "Error desconocido";
+    } finally {
+      isLoading = false;
+    }
   }
 
   onMount(async () => {
@@ -236,9 +266,13 @@
         on:input={updateFile}
       />
 
-      {#if filecsv}
+      {#if filecsv && minValueCSV !== undefined && maxValueCSV !== undefined}
         <div class="container-filters">
-          <MutiRange min={0} max={100} onchange={(e) => console.log(e)} />
+          <MutiRange
+            min={minValueCSV}
+            max={maxValueCSV}
+            onchange={(e) => (filters = e)}
+          />
         </div>
       {/if}
 
@@ -246,7 +280,7 @@
         <button
           type="button"
           class="btn btn-primary btn-lg"
-          on:click={applyFilters}>Aplicar filtros</button
+          on:click={() => applyFilters()}>Aplicar filtros</button
         >
       {/if}
     </div>
