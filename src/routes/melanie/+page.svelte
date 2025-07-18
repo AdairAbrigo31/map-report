@@ -1,27 +1,20 @@
 <main>
     <p class="phrase">
-        Hola fea, estoy algo mareado, creo que aqui pondre todas las cosas que
-        quisiera decirte y no me atrevo, o más bien, no debo. Es probable que
-        muchas de estas no las leas. Creo que nuestra ultima conversación no
-        salio bien, creo que nos rompimos más. Pero al menos fuimos honestos. A
-        veces pienso en nosotros, estos dias lo he hecho seguido. Pienso en
-        nuestra ultima noche juntos y en la primera. Pienso en que hubiese
-        pasado si yo no me hubiese ido. Creo que la conclusión a la que he
-        llegado es que de todas formas lo hubiera arruinado, era un niño. No
-        sabia lo que tenia. Creó que eso paso por algo, debimos dejarnos para
-        encontrarnos. Hemos alcanzado cosas grandes, estoy orgulloso de eso, de
-        tí. No me place saber que no estamos juntos pero es suficiente para mí
-        saber que estás bien, que él te cuida y que te hace feliz. Mereces ser
-        feliz. Eres una de las personas más buenas que conozco, te preocupas por
-        todo y por todos. Mi niña bonita, siempre te llevo conmigo aunque no
-        estés presente. Espero algún día amar a alguien como te amo a tí. No lo
-        digo con intenciones de sonar grosero o querer olvidarte, lo digo para
-        que tengas una idea de cuanto te quiero. Gracias por buscarme, me
-        hiciste volver a acelerar el corazón con tan sólo acariciar mi cabello.
-        No creo que haya otra vida pero si la hay no sé cómo ni cuando pero te
-        buscaré. Y si acaso en esta vida tú decides regresar y empezar de nuevo,
-        me encantaria hacerlo contigo. Suerte bonita, espero que vayas a Dubai y
-        que Ludovica disfrute de tu ciudado. Eres increible.
+        Fea. Hoy bebi un poco y luche por no llamarte. Queria escuchar tu voz y
+        preguntarte si ya me olvidaste. Queria preguntarte si de verdad eres
+        feliz con él. Queria preguntarte que sientes cuando el te besa. Queria
+        decirte que hoy sólo te pensé 3 veces en el día, que aun no te olvido
+        pero cada día te recuedo menos. Queria disculparme si nuestra ultima
+        conversación fue rara, no quise dañarte. Las cosas que dije pasaron pero
+        las que siento no. ¿Cómo pudiste enamorarme en 4 días? ¿Yo nací para tí?
+        ¿Acaso fuimos hechos en pares?. No lo sé, no sé si tú tambien sientes
+        esto que siento ahora. No es tristeza, es raro, es como por momentos
+        sentirse incompleto, como si algo pequeño faltara. Es como si el tope de
+        la alegria fuera el 99%- Me esfuerzo por o llamarte, no quiero que sepas
+        que aun te extraño y que aun sabiendo que no me amas yo lo hago. No
+        quiero que me percibas como debil, tampoco quiero causarte problemas.
+        Creó que él te merece aunque si te soy franco, nunca le perteneceras
+        porque tú me perteneces a mí y yo te pertenezco a tí.
     </p>
     <img src="/melanie_adair.jpeg" alt="Melanie" class="melanie-adair-photo" />
 </main>
