@@ -54,7 +54,7 @@
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
-      complete: function (results) {
+      complete: function (results: any) {
         try {
           if (results.errors.length > 0 || results.data.length === 0) {
             filecsv = null;
